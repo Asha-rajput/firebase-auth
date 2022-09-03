@@ -16,7 +16,7 @@ const AuthForm = () => {
     setIsLogin((prevState) => !prevState);
   };
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
     const enteredEmail = emailInputRef?.current?.value;
     const enteredpassword = passwordInputRef?.current?.value;
@@ -32,7 +32,7 @@ const AuthForm = () => {
       url =
         "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAK-P9FDIhIjS0SSGAsHqzWZO6F7NWRJoY";
     }
-    fetch(url, {
+    /*  fetch(url, {
       method: "POST",
       body: JSON.stringify({
         email: enteredEmail,
@@ -62,6 +62,33 @@ const AuthForm = () => {
       .catch((err) => {
         alert(err.message);
       });
+      */
+
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify({
+          email: enteredEmail,
+          password: enteredpassword,
+          returnSecureToken: true,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      setIsLoading(false);
+      if (res.ok) {
+        res.json().then((ab) => {
+          console.log("ab", ab);
+          authCtx.login(ab.idToken);
+          history.replace("/");
+        });
+      } else {
+        alert("Authentication failed!!");
+      }
+    } catch (error) {
+      alert(error?.message);
+    }
   };
 
   return (
